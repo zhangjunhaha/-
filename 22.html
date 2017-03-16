@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>$</title>
+</head>
+<body>
+<canvas id="canvas" width="800" height="600" style="border:1px solid red"></canvas>
+</body>
+<script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    function clock(obj) {
+        var obj1={
+            topX: 300,
+            topY: 300,
+            topR: 150,
+            length1: 25,
+            length2: 10,
+            widths1: 3,
+            widths2: 6,
+            length3: 100
+        };
+        for (var key in obj) {
+            this[key] = obj[key];
+        }
+        this.init();
+    }
+    clock.prototype = {
+        constructor: clock,
+        //初始化
+        init: function () {
+            var self = this
+            setInterval(function () {
+                self.ctx.clearRect(0, 0, self.ctx.canvas.width, self.ctx.canvas.height);
+                self.circle();
+                self.bar();
+                self.rotates();
+            }, 1000)
+        },
+        //旋转
+        rotates: function () {
+            var date = new Date();
+            var ms = date.getMilliseconds();
+            var s = date.getSeconds();
+            var randian0 = 2 * Math.PI / 60 * (s + ms / 1000);
+            this.pointer(65, 2, randian0-Math.PI/2, "red");
+            var m = date.getMinutes();
+            var randian1 = 2 * Math.PI / 60 * (m + s / 60);
+            this.pointer(50, 4, randian1-Math.PI/2, "blue");
+            var h = date.getHours();
+            h = h % 12;
+            var randian2 = 2 * Math.PI / 12 * (h + (m + s / 60) / 60);
+            this.pointer(40, 6, randian2-Math.PI/2, "green");
+        },
+        //圆
+        circle: function () {
+            var ctx = this.ctx;
+            ctx.beginPath();
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = "#335F9A";
+            ctx.arc(this.topX, this.topY, this.topR, 0, 2 * Math.PI);
+            ctx.stroke();
+        },
+        //条形
+        bar: function () {
+            var ctx = this.ctx;
+            var randian = 2 * Math.PI / 60;
+            var start = -Math.PI / 3;
+            for (var i = 0; i < 60; i++) {
+                var samllRandian = randian * i + start;
+                var h1, b1;
+                var length, widths;
+                if (i % 5 == 0) {
+                    length = this.length1;
+                    widths = this.widths2;
+                    this.character(samllRandian, i / 5 + 1);
+                } else {
+                    length = this.length2;
+                    widths = this.widths1;
+                }
+                var h1 = Math.sin(samllRandian) * (this.topR - length - 3);
+                var b1 = Math.cos(samllRandian) * (this.topR - length - 3);
+                var H = Math.sin(samllRandian) * (this.topR - 3);
+                var B = Math.cos(samllRandian) * (this.topR - 3);
+                var topx1 = this.topX + B, topy1 = this.topY + H;//圆上坐标
+                var topx2 = this.topX + b1, topy2 = this.topY + h1;//圆上坐标
+                ctx.beginPath();
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = widths;
+                ctx.moveTo(topx1, topy1);
+                ctx.lineTo(topx2, topy2);
+                ctx.stroke();
+            }
+        },
+        //文字
+        character: function (samllRandian, i) {
+            var ctx = this.ctx;
+            var h2 = Math.sin(samllRandian) * this.length3;
+            var b2 = Math.cos(samllRandian) * this.length3;
+            ctx.font = "20px 微软雅黑";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "midlle";
+            ctx.fillText(i, this.topX + b2, this.topY + h2);
+        },
+        //指针
+        /**
+         *
+         * @param leng指针长度
+         * @param w指针宽度
+         * @param du度数
+         * @param color颜色
+         */
+        pointer: function (leng, w, du, color) {
+            var ctx = this.ctx;
+            ctx.save();
+            ctx.beginPath();
+            ctx.lineWidth = w;
+            ctx.strokeStyle = color;
+            ctx.moveTo(this.topX, this.topY);
+            ctx.lineTo(Math.cos(du) * leng + this.topX, Math.sin(du) * leng + this.topY);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    var zhongbiao = new clock(
+            {
+                ctx: ctx,
+                topX: 300,
+                topY: 300,
+                topR: 150,
+                length1: 25,
+                length2: 10,
+                widths1: 3,
+                widths2: 6,
+                length3: 100
+            }
+    );
+</script>
+</html>
